@@ -1,0 +1,8 @@
+#for nodejs projects
+node_modules/
+.env
+*.log
+dist/
+
+#syncthing stuffs
+.stfolder

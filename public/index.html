@@ -5,13 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Very Own Fucking Website</title>
+
+    <!-- FOR TAILWIND CSS -->
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+    <!-- FOR XTERM (TERMINAL CSS) -->
+    <link rel="stylesheet" href="https://unpkg.com/xterm/css/xterm.css" />
 </head>
 
 <body class="flex flex-col bg-blue-200 gap-4">
 
+    <!-- Nav Bar -->
     <nav class="flex h-16 bg-blue-400 justify-center md:justify-start md:pl-4 items-center">
-        <h1 class="text-3xl font-bold">Website ni Anthony!!!</h1>
+        <h1 class="text-3xl font-bold">Website ni Thony@!!1!1!</h1>
     </nav>
 
     <div class="flex flex-col md:grid md:grid-cols-2 gap-4 mx-4">
@@ -24,6 +30,7 @@
             <h3>Social Media</h3>
         </div>
 
+        <!-- SERVER STATUS AND HOME DEVICES -->
         <div class="flex flex-col gap-4">
             <!-- SERVER STATUS -->
             <div class="bg-blue-300 rounded-lg px-4 py-2">
@@ -45,7 +52,53 @@
                     <li>Desktop - Offline</li>
                 </ul>
             </div>
+
         </div>
+
+        <!-- SSH TERMINAL -->
+        <div class="bg-blue-300 rounded-lg p-2 md:col-span-2" id="terminal"></div>
+
+        <!-- SSH TERMINAL SCRIPT -->
+        <script src="https://unpkg.com/xterm/lib/xterm.js"></script>
+
+        <!-- TO CONNECT FRONT END TO BACK END ??? -->
+        <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+        <script>
+            const socket = io();
+    
+            const term = new Terminal();
+            term.open(document.getElementById('terminal'));
+    
+            // Handle SSH connection
+            const sshConfig = {
+                host: '192.168.101.1',
+                port: 22,
+                username: 'thony',
+                password: 'root', // Or use privateKey for key-based auth
+            };
+    
+            socket.emit('ssh-connect', sshConfig);
+    
+            // Handle incoming data from the SSH server
+            socket.on('ssh-data', (data) => {
+                term.write(data);
+            });
+    
+            // Handle errors
+            socket.on('ssh-error', (error) => {
+                term.writeln(`Error: ${error}`);
+            });
+    
+            // Handle SSH connection closure
+            socket.on('ssh-closed', () => {
+                term.writeln('SSH Connection Closed');
+            });
+    
+            // Send user input to the SSH server
+            term.onData((data) => {
+                socket.emit('ssh-command', data);
+            });
+        </script>
     </div>
 
     <footer class="flex w-full justify-end pr-4">
