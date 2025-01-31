@@ -11,29 +11,40 @@
 
     <!-- FOR XTERM (TERMINAL CSS) -->
     <link rel="stylesheet" href="https://unpkg.com/xterm/css/xterm.css" />
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
 
 <body class="flex flex-col bg-blue-200 gap-4">
 
-    <!-- Nav Bar -->
+    <!-- NAVBAR -->
     <nav class="flex h-16 bg-blue-400 justify-center md:justify-start md:pl-4 items-center">
         <h1 class="text-3xl font-bold">Website ni Thony@!!1!1!</h1>
     </nav>
 
-    <div class="flex flex-col md:grid md:grid-cols-2 gap-4 mx-4">
-        
-        <!-- ABOUT ME -->
-        <div class="bg-blue-300 rounded-lg px-4 py-2">
-            <h2 class="text-2xl font-semibold ">About Me</h2>
-            <h3>Awards and Achievements</h3>
-            <h3>Personal Projects</h3>
-            <h3>Social Media</h3>
-        </div>
+    <!-- CONTENT -->
+    <div class="flex flex-col gap-4 mx-4"> <!-- md:grid md:grid-cols-2 -->
 
+        <!-- ABOUT AND TERMINAL -->
+        <div class="flex flex-col gap-4 md:flex-row">
+            <!-- ABOUT ME -->
+            <div class="bg-blue-300 rounded-lg px-4 py-2 md:flex-1">
+                <h2 class="text-2xl font-semibold ">About Me</h2>
+                <h3>Awards and Achievements</h3>
+                <h3>Personal Projects</h3>
+                <h3>Social Media</h3>
+            </div>
+
+            <!-- SSH TERMINAL -->
+            <div class="bg-blue-300 p-2 rounded-lg overflow-auto">
+                <div class="w-[732px]" id="terminal"></div>
+            </div>
+        </div>
+        
         <!-- SERVER STATUS AND HOME DEVICES -->
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-4 md:flex-row ">
             <!-- SERVER STATUS -->
-            <div class="bg-blue-300 rounded-lg px-4 py-2">
+            <div class="bg-blue-300 rounded-lg px-4 py-2 flex-1">
                 <h2 class="text-2xl font-semibold">Server Status</h2>
                 <ul class="text-md">
                     <li>Temperature: 85 degree celcius</li>
@@ -42,7 +53,7 @@
             </div>
     
             <!-- HOME DEVICES -->
-            <div class="bg-blue-300 rounded-lg px-4 py-2">
+            <div class="bg-blue-300 rounded-lg px-4 py-2 flex-1">
                 <h2 class="text-2xl font-semibold">Home Devices</h2>
                 <ul class="text-md">
                     <li>Ubuntu Server - Online</li>
@@ -55,55 +66,53 @@
 
         </div>
 
-        <!-- SSH TERMINAL -->
-        <div class="bg-blue-300 rounded-lg p-2 md:col-span-2" id="terminal"></div>
-
-        <!-- SSH TERMINAL SCRIPT -->
-        <script src="https://unpkg.com/xterm/lib/xterm.js"></script>
-
-        <!-- TO CONNECT FRONT END TO BACK END ??? -->
-        <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-        <script>
-            const socket = io();
-    
-            const term = new Terminal();
-            term.open(document.getElementById('terminal'));
-    
-            // Handle SSH connection
-            const sshConfig = {
-                host: '192.168.101.1',
-                port: 22,
-                username: 'thony',
-                password: 'root', // Or use privateKey for key-based auth
-            };
-    
-            socket.emit('ssh-connect', sshConfig);
-    
-            // Handle incoming data from the SSH server
-            socket.on('ssh-data', (data) => {
-                term.write(data);
-            });
-    
-            // Handle errors
-            socket.on('ssh-error', (error) => {
-                term.writeln(`Error: ${error}`);
-            });
-    
-            // Handle SSH connection closure
-            socket.on('ssh-closed', () => {
-                term.writeln('SSH Connection Closed');
-            });
-    
-            // Send user input to the SSH server
-            term.onData((data) => {
-                socket.emit('ssh-command', data);
-            });
-        </script>
     </div>
 
+    <!-- FOOTER -->
     <footer class="flex w-full justify-end pr-4">
         <p class="text-md">Website ni Anthony!!!!! Powered by Ubuntu Servuhh!</p>
     </footer>
+
+    <!-- SSH TERMINAL CSS SCRIPT -->
+    <script src="https://unpkg.com/xterm/lib/xterm.js"></script>
+    <!-- TO CONNECT FRONT END TO BACK END ??? -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+
+        const term = new Terminal();
+        term.open(document.getElementById('terminal'));
+
+        // Handle SSH connection
+        const sshConfig = {
+            host: '192.168.101.1',
+            port: 22,
+            username: 'thony',
+            password: 'root', // Or use privateKey for key-based auth
+        };
+
+        socket.emit('ssh-connect', sshConfig);
+
+        // Handle incoming data from the SSH server
+        socket.on('ssh-data', (data) => {
+            term.write(data);
+        });
+
+        // Handle errors
+        socket.on('ssh-error', (error) => {
+            term.writeln(`Error: ${error}`);
+        });
+
+        // Handle SSH connection closure
+        socket.on('ssh-closed', () => {
+            term.writeln('SSH Connection Closed');
+        });
+
+        // Send user input to the SSH server
+        term.onData((data) => {
+            socket.emit('ssh-command', data);
+        });
+    </script>
 
 </body>
 
