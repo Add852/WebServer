@@ -15,7 +15,7 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
 
-<body class="flex flex-col bg-blue-200 gap-4">
+<body class="flex flex-col bg-blue-200 gap-4 overflow-x-hidden">
 
     <!-- NAVBAR -->
     <nav class="flex h-16 bg-blue-400 justify-center md:justify-start md:pl-4 items-center">
@@ -23,7 +23,7 @@
     </nav>
 
     <!-- CONTENT -->
-    <div class="flex flex-col gap-4 mx-4"> <!-- md:grid md:grid-cols-2 -->
+    <div class="flex flex-col gap-4 mx-4">
 
         <!-- ABOUT AND TERMINAL -->
         <div class="flex flex-col gap-4 md:flex-row">
@@ -36,8 +36,48 @@
             </div>
 
             <!-- SSH TERMINAL -->
-            <div class="bg-blue-300 p-2 rounded-lg overflow-auto">
+            <div class="bg-blue-300 p-2 rounded-lg overflow-x-auto">
                 <div class="w-[732px]" id="terminal"></div>
+                <!-- SSH TERMINAL CSS SCRIPT -->
+                <script src="https://unpkg.com/xterm/lib/xterm.js"></script>
+                <!-- TO CONNECT FRONT END TO BACK END ??? -->
+                <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+                <script>
+                    const socket = io();
+
+                    const term = new Terminal();
+                    term.open(document.getElementById('terminal'));
+
+                    // Handle SSH connection
+                    const sshConfig = {
+                        host: '192.168.101.1',
+                        port: 22,
+                        username: 'thony',
+                        password: 'root', // Or use privateKey for key-based auth
+                    };
+
+                    socket.emit('ssh-connect', sshConfig);
+
+                    // Handle incoming data from the SSH server
+                    socket.on('ssh-data', (data) => {
+                        term.write(data);
+                    });
+
+                    // Handle errors
+                    socket.on('ssh-error', (error) => {
+                        term.writeln(`Error: ${error}`);
+                    });
+
+                    // Handle SSH connection closure
+                    socket.on('ssh-closed', () => {
+                        term.writeln('SSH Connection Closed');
+                    });
+
+                    // Send user input to the SSH server
+                    term.onData((data) => {
+                        socket.emit('ssh-command', data);
+                    });
+                </script>
             </div>
         </div>
         
@@ -72,47 +112,6 @@
     <footer class="flex w-full justify-end pr-4">
         <p class="text-md">Website ni Anthony!!!!! Powered by Ubuntu Servuhh!</p>
     </footer>
-
-    <!-- SSH TERMINAL CSS SCRIPT -->
-    <script src="https://unpkg.com/xterm/lib/xterm.js"></script>
-    <!-- TO CONNECT FRONT END TO BACK END ??? -->
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-    <script>
-        const socket = io();
-
-        const term = new Terminal();
-        term.open(document.getElementById('terminal'));
-
-        // Handle SSH connection
-        const sshConfig = {
-            host: '192.168.101.1',
-            port: 22,
-            username: 'thony',
-            password: 'root', // Or use privateKey for key-based auth
-        };
-
-        socket.emit('ssh-connect', sshConfig);
-
-        // Handle incoming data from the SSH server
-        socket.on('ssh-data', (data) => {
-            term.write(data);
-        });
-
-        // Handle errors
-        socket.on('ssh-error', (error) => {
-            term.writeln(`Error: ${error}`);
-        });
-
-        // Handle SSH connection closure
-        socket.on('ssh-closed', () => {
-            term.writeln('SSH Connection Closed');
-        });
-
-        // Send user input to the SSH server
-        term.onData((data) => {
-            socket.emit('ssh-command', data);
-        });
-    </script>
 
 </body>
 
